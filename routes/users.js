@@ -1,10 +1,12 @@
 var express = require('express');
 var router = express.Router();
-const pool = require("../helpers/db");
 const User = require("../models/users.model");
+const bcrypt = require('bcrypt');
+const saltRounds = process.env.SALTROUNDS;
+
 
 /* GET users listing.*/
-router.get('/', async function (req, res, next) {
+router.get("/", async function (req, res, next) {
   try {
     const getUserResponse = await User.findAll();
     res.send({
@@ -24,15 +26,30 @@ router.get('/', async function (req, res, next) {
 /**
  * Create User route
  */
-router.post('/', async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
-    const userCreationResponse = await User.create(req.body);
+    // console.log(req.body, "=================");
+    const postBody = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: bcrypt.hashSync(req.body.password, parseInt(saltRounds)),
+      phoneNumber: req.body.phoneNumber
+    };
+    if (req.body.isAdminUser === true) {
+      postBody["roleId"] = "1";
+      postBody["roleName"] = "admin";
+
+    }
+    const userCreationResponse = await User.create(postBody);
+    // console.log("===", userCreationResponse);
     res.send({
       "success": true,
       "message": "User created successfully"
     })
   }
   catch (err) {
+    console.log("error", err);
     res.send({
       "success": false,
       "message": "User creation failed"

@@ -1,27 +1,45 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-const sequelize = require('./helpers/db');
-const User = require('./models/users.model');
+var express = require("express");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+var logger = require("morgan");
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const sequelize = require("./helpers/db");
+
+var indexRouter = require("./routes/index");
+var usersRouter = require("./routes/users");
 const courseRouter = require("./routes/courses");
 
 var app = express();
+var server = require('http').createServer(app);
+
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
+const dbDriver = process.env.DB_USER;
 
+console.log(dbDriver, "=====");
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    callback(null, true);
+  }
+};
+app.use(cors(corsOptions));
+// cors
+if (process.env.NODE_ENV === 'development') {
+  app.use(cors({ origin: `*` }));
+} else {
+  app.use(cors({ origin: `*` }));
+}
 // sync DB models 
 sequelize.sync()
   .then(() => {
@@ -31,24 +49,12 @@ sequelize.sync()
     console.error('Error creating database & tables:', err);
   });
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use("/", indexRouter);
+app.use("/users", usersRouter);
 app.use('/courses', courseRouter);
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
+
+const port = process.env.PORT || 80;
+server.listen(port, () => {
+  console.log(`Server is running on port ${port} in ${process.env.NODE_ENV} Mode`);
 });
-
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
-
-module.exports = app;
