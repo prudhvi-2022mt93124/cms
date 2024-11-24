@@ -8,7 +8,6 @@ exports.createJwt = async (userId, userName, roleId, roleName, name) => {
         let createToken = jwt.sign({
             _id: userId,
             userName: userName,
-            signUpVia: signUpVia,
             roleId: roleId,
             roleName: roleName,
             name: name,

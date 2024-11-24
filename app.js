@@ -8,6 +8,7 @@ const sequelize = require("./helpers/db");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 const courseRouter = require("./routes/courses");
+const authRouter = require("./routes/auth");
 
 var app = express();
 var server = require('http').createServer(app);
@@ -52,6 +53,7 @@ sequelize.sync()
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use('/courses', courseRouter);
+app.use("/auth", authRouter);
 
 
 const port = process.env.PORT || 80;

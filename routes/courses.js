@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-const pool = require("../helpers/db");
 const Course = require("../models/course.model");
 
 /* GET Courses listing.*/
