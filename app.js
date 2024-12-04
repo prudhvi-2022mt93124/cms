@@ -42,13 +42,13 @@ if (process.env.NODE_ENV === 'development') {
   app.use(cors({ origin: `*` }));
 }
 // sync DB models 
-sequelize.sync()
-  .then(() => {
-    console.log('Database & tables created!');
-  })
-  .catch(err => {
-    console.error('Error creating database & tables:', err);
-  });
+// sequelize.sync()
+//   .then(() => {
+//     console.log('Database & tables created!');
+//   })
+//   .catch(err => {
+//     console.error('Error creating database & tables:', err);
+//   });
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
